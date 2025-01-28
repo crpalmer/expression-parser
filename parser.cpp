@@ -59,6 +59,14 @@ Expression *parse_literal_expression(Tokenizer *tokenizer) {
 	if (expr) expr = new UnaryOperatorExpression(token, expr);
 	return expr;
     }
+    if (token->is_operator(OP_OPEN_PAREN)) {
+	tokenizer->pop();
+	Expression *expr = parse_expression(tokenizer);
+	if (! tokenizer->pop(&token) || ! token->is_operator(OP_CLOSE_PAREN)) {
+	    return error("Missing closing parenthesis", token);
+	}
+	return expr;
+    }
     return error("Invalid token", token);
 }
 

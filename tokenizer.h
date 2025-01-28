@@ -2,7 +2,7 @@
 #define __TOKENIZER_H__
 
 typedef enum { TOK_NUMBER, TOK_OPERATOR } token_type_t;
-typedef enum { OP_PLUS, OP_MINUS } token_operator_t;
+typedef enum { OP_PLUS, OP_MINUS, OP_OPEN_PAREN, OP_CLOSE_PAREN } token_operator_t;
 
 class Token {
 public:

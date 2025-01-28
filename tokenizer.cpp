@@ -12,6 +12,8 @@ void OperatorToken::print() {
     switch(op) {
     case OP_PLUS: printf("+"); break;
     case OP_MINUS: printf("-"); break;
+    case OP_OPEN_PAREN: printf("("); break;
+    case OP_CLOSE_PAREN: printf(")"); break;
     default: assert(0);
     }
 }
@@ -40,6 +42,8 @@ void Tokenizer::get_next_token() {
 	switch(input[pos]) {
 	case '+': next_token = new OperatorToken(OP_PLUS); break;
 	case '-': next_token = new OperatorToken(OP_MINUS); break;
+	case '(': next_token = new OperatorToken(OP_OPEN_PAREN); break;
+	case ')': next_token = new OperatorToken(OP_CLOSE_PAREN); break;
 	default:
 	    printf("Unknown operator '%c':\n", input[pos]);
 	    printf("%.*s ^^^ %s\n", pos, input, &input[pos]);
