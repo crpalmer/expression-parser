@@ -15,7 +15,14 @@ void LiteralExpression::print() {
     print_number(value);
 }
 
-void OperatorExpression::print() {
+void UnaryOperatorExpression::print() {
+    printf("(");
+    op->print();
+    expr->print();
+    printf(")");
+}
+
+void BinaryOperatorExpression::print() {
     printf("(");
     lhs->print();
     op->print();
@@ -23,7 +30,16 @@ void OperatorExpression::print() {
     printf(")");
 }
 
-double OperatorExpression::evaluate() {
+double UnaryOperatorExpression::evaluate() {
+    double v = expr->evaluate();
+    switch(op->get_operator()) {
+    case OP_PLUS: return v;
+    case OP_MINUS: return -v;
+    default: assert(0);
+    }
+}
+
+double BinaryOperatorExpression::evaluate() {
     double v1 = lhs->evaluate();
     double v2 = rhs->evaluate();
     switch(op->get_operator()) {
@@ -40,6 +56,14 @@ Expression *parse_literal_expression(Tokenizer *tokenizer) {
 	tokenizer->pop();
 	NumberToken *number = static_cast<NumberToken *>(token);
 	return new LiteralExpression(number->get_value());
+    }
+    if (token->get_type() == TOK_OPERATOR) {
+	OperatorToken *op = static_cast<OperatorToken *>(token);
+	if (op->get_operator() == OP_MINUS || op->get_operator() == OP_PLUS) {
+	    tokenizer->pop();
+	    Expression *expr = parse_literal_expression(tokenizer);
+	    return new UnaryOperatorExpression(op, expr);
+	}
     }
     return error("Invalid token", token);
 }
@@ -62,7 +86,7 @@ Expression *parse_addition_expression(Tokenizer *tokenizer) {
 	if (rhs == NULL) {
 	    return error("Failed to parse the rhs", token);
 	}
-	lhs = new OperatorExpression(lhs, op, rhs);
+	lhs = new BinaryOperatorExpression(lhs, op, rhs);
     }
     return lhs;
 }

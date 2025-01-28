@@ -9,9 +9,20 @@ public:
     virtual double evaluate() = 0;
 };
 
-class OperatorExpression : public Expression {
+class UnaryOperatorExpression : public Expression {
 public:
-    OperatorExpression(Expression *lhs, OperatorToken *op, Expression *rhs) : lhs(lhs), op(op), rhs(rhs) {}
+    UnaryOperatorExpression(OperatorToken *op, Expression *expr) : op(op), expr(expr) {}
+    void print() override;
+    double evaluate() override;
+
+private:
+    OperatorToken *op;
+    Expression *expr;
+};
+
+class BinaryOperatorExpression : public Expression {
+public:
+    BinaryOperatorExpression(Expression *lhs, OperatorToken *op, Expression *rhs) : lhs(lhs), op(op), rhs(rhs) {}
     void print() override;
     double evaluate() override;
 
