@@ -32,21 +32,17 @@ void BinaryOperatorExpression::print() {
 
 double UnaryOperatorExpression::evaluate() {
     double v = expr->evaluate();
-    switch(op->get_operator()) {
-    case OP_PLUS: return v;
-    case OP_MINUS: return -v;
-    default: assert(0);
-    }
+    if (op->is_operator(OP_PLUS)) return v;
+    if (op->is_operator(OP_MINUS)) return -v;
+    assert(0);
 }
 
 double BinaryOperatorExpression::evaluate() {
     double v1 = lhs->evaluate();
     double v2 = rhs->evaluate();
-    switch(op->get_operator()) {
-    case OP_PLUS: return v1 + v2;
-    case OP_MINUS: return v1 - v2;
-    default: assert(0);
-    }
+    if (op->is_operator(OP_PLUS)) return v1 + v2;
+    if (op->is_operator(OP_MINUS)) return v1 - v2;
+    assert(0);
 }
 
 Expression *parse_literal_expression(Tokenizer *tokenizer) {
@@ -57,13 +53,11 @@ Expression *parse_literal_expression(Tokenizer *tokenizer) {
 	NumberToken *number = static_cast<NumberToken *>(token);
 	return new LiteralExpression(number->get_value());
     }
-    if (token->get_type() == TOK_OPERATOR) {
-	OperatorToken *op = static_cast<OperatorToken *>(token);
-	if (op->get_operator() == OP_MINUS || op->get_operator() == OP_PLUS) {
-	    tokenizer->pop();
-	    Expression *expr = parse_literal_expression(tokenizer);
-	    return new UnaryOperatorExpression(op, expr);
-	}
+    if (token->is_operator(OP_MINUS) || token->is_operator(OP_PLUS)) {
+	tokenizer->pop();
+	Expression *expr = parse_literal_expression(tokenizer);
+	if (expr) expr = new UnaryOperatorExpression(token, expr);
+	return expr;
     }
     return error("Invalid token", token);
 }
@@ -74,19 +68,13 @@ Expression *parse_addition_expression(Tokenizer *tokenizer) {
 
     lhs = parse_literal_expression(tokenizer);
 
-    while (tokenizer->peek(&token) && token->get_type() == TOK_OPERATOR) {
-	OperatorToken *op = static_cast<OperatorToken *>(token);
-
-	if (op->get_operator() != OP_PLUS && op->get_operator() != OP_MINUS) {
-	    break;
-	}
-
+    while (tokenizer->peek(&token) && (token->is_operator(OP_PLUS) || token->is_operator(OP_MINUS))) {
 	tokenizer->pop();
 	Expression *rhs = parse_literal_expression(tokenizer);
 	if (rhs == NULL) {
 	    return error("Failed to parse the rhs", token);
 	}
-	lhs = new BinaryOperatorExpression(lhs, op, rhs);
+	lhs = new BinaryOperatorExpression(lhs, token, rhs);
     }
     return lhs;
 }

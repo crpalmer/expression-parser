@@ -11,23 +11,23 @@ public:
 
 class UnaryOperatorExpression : public Expression {
 public:
-    UnaryOperatorExpression(OperatorToken *op, Expression *expr) : op(op), expr(expr) {}
+    UnaryOperatorExpression(Token *op, Expression *expr) : op(op), expr(expr) {}
     void print() override;
     double evaluate() override;
 
 private:
-    OperatorToken *op;
+    Token *op;
     Expression *expr;
 };
 
 class BinaryOperatorExpression : public Expression {
 public:
-    BinaryOperatorExpression(Expression *lhs, OperatorToken *op, Expression *rhs) : lhs(lhs), op(op), rhs(rhs) {}
+    BinaryOperatorExpression(Expression *lhs, Token *op, Expression *rhs) : lhs(lhs), op(op), rhs(rhs) {}
     void print() override;
     double evaluate() override;
 
 private:
-    OperatorToken *op;
+    Token *op;
     Expression *lhs, *rhs;
 };
 

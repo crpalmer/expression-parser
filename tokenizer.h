@@ -10,6 +10,8 @@ public:
     virtual void print() = 0;
     token_type_t get_type() { return type; }
 
+    virtual bool is_operator(token_operator_t op) { return false; }
+
 protected:
     token_type_t type;
 };
@@ -29,6 +31,7 @@ public:
     OperatorToken(token_operator_t op) : Token(TOK_OPERATOR), op(op) {}
     void print() override;
     token_operator_t get_operator() { return op; }
+    bool is_operator(token_operator_t op) { return op == this->op; }
 
 private:
     token_operator_t op;
