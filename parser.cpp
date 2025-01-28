@@ -107,5 +107,8 @@ Expression *parse_addition_expression(Tokenizer *tokenizer) {
 }
 
 Expression *parse_expression(Tokenizer *tokenizer) {
-    return parse_addition_expression(tokenizer);
+    Expression *expr = parse_addition_expression(tokenizer);
+    Token *token;
+    if (tokenizer->pop(&token)) return error("Extra input", token);
+    return expr;
 }
