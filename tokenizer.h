@@ -1,7 +1,7 @@
 #ifndef __TOKENIZER_H__
 #define __TOKENIZER_H__
 
-typedef enum { TOK_NUMBER, TOK_OPERATOR } token_type_t;
+typedef enum { TOK_NUMBER, TOK_OPERATOR, TOK_VARIABLE } token_type_t;
 typedef enum {
     OP_PLUS, OP_MINUS,
     OP_OPEN_PAREN, OP_CLOSE_PAREN,
@@ -19,6 +19,16 @@ public:
 
 protected:
     token_type_t type;
+};
+
+class VariableToken : public Token {
+public:
+    VariableToken(const char *name) : Token(TOK_VARIABLE), name(name) {}
+    void print() override;
+    const char *get_name() { return name; }
+
+private:
+    const char *name;
 };
 
 class NumberToken : public Token {

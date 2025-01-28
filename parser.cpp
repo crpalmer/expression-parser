@@ -12,50 +12,18 @@ Expression *error(const char *str, Token *token) {
     return NULL;
 }
 
-void LiteralExpression::print() {
-    print_number(value);
-}
-
-void UnaryOperatorExpression::print() {
-    printf("(");
-    op->print();
-    expr->print();
-    printf(")");
-}
-
-void BinaryOperatorExpression::print() {
-    printf("(");
-    lhs->print();
-    op->print();
-    rhs->print();
-    printf(")");
-}
-
-double UnaryOperatorExpression::evaluate() {
-    double v = expr->evaluate();
-    if (op->is_operator(OP_PLUS)) return v;
-    if (op->is_operator(OP_MINUS)) return -v;
-    assert(0);
-}
-
-double BinaryOperatorExpression::evaluate() {
-    double v1 = lhs->evaluate();
-    double v2 = rhs->evaluate();
-    if (op->is_operator(OP_PLUS)) return v1 + v2;
-    if (op->is_operator(OP_MINUS)) return v1 - v2;
-    if (op->is_operator(OP_MULTIPLY)) return v1 * v2;
-    if (op->is_operator(OP_DIVIDE)) return v1 / v2;
-    if (op->is_operator(OP_EXPONENT)) return pow(v1, v2);
-    assert(0);
-}
-
 Expression *parse_literal_expression(Tokenizer *tokenizer) {
     Token *token;
     if (! tokenizer->peek(&token)) return NULL;
     if (token->get_type() == TOK_NUMBER) {
 	tokenizer->pop();
-	NumberToken *number = static_cast<NumberToken *>(token);
+	NumberToken *number = (NumberToken *) token;
 	return new LiteralExpression(number->get_value());
+    }
+    if (token->get_type() == TOK_VARIABLE) {
+	tokenizer->pop();
+	VariableToken *var = (VariableToken *) token;
+	return new VariableExpression(var);
     }
     if (token->is_operator(OP_MINUS) || token->is_operator(OP_PLUS)) {
 	tokenizer->pop();

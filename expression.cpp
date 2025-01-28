@@ -1,21 +1,47 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include <assert.h>
+#include <string.h>
 #include <math.h>
 #include "parser.h"
-#include "tokenizer.h"
 #include "utils.h"
 
-static char line[100*1024];
+void LiteralExpression::print() {
+    print_number(value);
+}
 
-int main(int argc, char **argv) {
-    while (fgets(line, sizeof(line), stdin) != NULL) {
-	Expression *expr = parse_expression(new Tokenizer(line));
-	if (expr != NULL) {
-	    expr->print();
-	    printf(" = ");
-	    print_number(expr->evaluate());
-	    printf("\n");
-	}
-    }
-    return 0;
+void VariableExpression::print() {
+    var->print();
+}
+
+void UnaryOperatorExpression::print() {
+    printf("(");
+    op->print();
+    expr->print();
+    printf(")");
+}
+
+void BinaryOperatorExpression::print() {
+    printf("(");
+    lhs->print();
+    op->print();
+    rhs->print();
+    printf(")");
+}
+
+double UnaryOperatorExpression::evaluate() {
+    double v = expr->evaluate();
+    if (op->is_operator(OP_PLUS)) return v;
+    if (op->is_operator(OP_MINUS)) return -v;
+    assert(0);
+}
+
+double BinaryOperatorExpression::evaluate() {
+    double v1 = lhs->evaluate();
+    double v2 = rhs->evaluate();
+    if (op->is_operator(OP_PLUS)) return v1 + v2;
+    if (op->is_operator(OP_MINUS)) return v1 - v2;
+    if (op->is_operator(OP_MULTIPLY)) return v1 * v2;
+    if (op->is_operator(OP_DIVIDE)) return v1 / v2;
+    if (op->is_operator(OP_EXPONENT)) return pow(v1, v2);
+    assert(0);
 }

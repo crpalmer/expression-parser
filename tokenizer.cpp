@@ -1,8 +1,14 @@
 #include <stdio.h>
 #include <assert.h>
 #include <ctype.h>
+#include <malloc.h>
+#include <string.h>
 
 #include "tokenizer.h"
+
+void VariableToken::print() {
+    printf("%s", name);
+}
 
 void NumberToken::print() {
     printf("%f", value);
@@ -41,6 +47,13 @@ void Tokenizer::get_next_token() {
 	}
 	next_token = new NumberToken(number);
 	pos += n;
+    } else if (isalpha(input[pos]) || input[pos] == '_') {
+	int start = pos;
+	while (isalnum(input[pos]) || input[pos] == '_') pos++;
+	char *name = (char *) malloc(pos - start + 1);
+	strncpy(name, &input[start], pos - start);
+	name[pos - start] = '\0';
+	next_token = new VariableToken(name);
     } else {
 	switch(input[pos]) {
 	case '+': next_token = new OperatorToken(OP_PLUS); break;
