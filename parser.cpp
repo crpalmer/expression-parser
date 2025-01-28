@@ -42,6 +42,8 @@ double BinaryOperatorExpression::evaluate() {
     double v2 = rhs->evaluate();
     if (op->is_operator(OP_PLUS)) return v1 + v2;
     if (op->is_operator(OP_MINUS)) return v1 - v2;
+    if (op->is_operator(OP_MULTIPLY)) return v1 * v2;
+    if (op->is_operator(OP_DIVIDE)) return v1 / v2;
     assert(0);
 }
 
@@ -70,15 +72,32 @@ Expression *parse_literal_expression(Tokenizer *tokenizer) {
     return error("Invalid token", token);
 }
 
-Expression *parse_addition_expression(Tokenizer *tokenizer) {
+Expression *parse_multiplication_expression(Tokenizer *tokenizer) {
     Token *token;
     Expression *lhs;
 
     lhs = parse_literal_expression(tokenizer);
 
-    while (tokenizer->peek(&token) && (token->is_operator(OP_PLUS) || token->is_operator(OP_MINUS))) {
+    while (tokenizer->peek(&token) && (token->is_operator(OP_MULTIPLY) || token->is_operator(OP_DIVIDE))) {
 	tokenizer->pop();
 	Expression *rhs = parse_literal_expression(tokenizer);
+	if (rhs == NULL) {
+	    return error("Failed to parse the rhs", token);
+	}
+	lhs = new BinaryOperatorExpression(lhs, token, rhs);
+    }
+    return lhs;
+}
+
+Expression *parse_addition_expression(Tokenizer *tokenizer) {
+    Token *token;
+    Expression *lhs;
+
+    lhs = parse_multiplication_expression(tokenizer);
+
+    while (tokenizer->peek(&token) && (token->is_operator(OP_PLUS) || token->is_operator(OP_MINUS))) {
+	tokenizer->pop();
+	Expression *rhs = parse_multiplication_expression(tokenizer);
 	if (rhs == NULL) {
 	    return error("Failed to parse the rhs", token);
 	}
