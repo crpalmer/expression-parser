@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+#include <math.h>
 #include "parser.h"
 #include "utils.h"
 
@@ -44,6 +45,7 @@ double BinaryOperatorExpression::evaluate() {
     if (op->is_operator(OP_MINUS)) return v1 - v2;
     if (op->is_operator(OP_MULTIPLY)) return v1 * v2;
     if (op->is_operator(OP_DIVIDE)) return v1 / v2;
+    if (op->is_operator(OP_EXPONENT)) return pow(v1, v2);
     assert(0);
 }
 
@@ -72,15 +74,29 @@ Expression *parse_literal_expression(Tokenizer *tokenizer) {
     return error("Invalid token", token);
 }
 
-Expression *parse_multiplication_expression(Tokenizer *tokenizer) {
+Expression *parse_exponent_expression(Tokenizer *tokenizer) {
     Token *token;
     Expression *lhs;
 
     lhs = parse_literal_expression(tokenizer);
+    if (tokenizer->peek(&token) && token->is_operator(OP_EXPONENT)) {
+	tokenizer->pop();
+	Expression *rhs = parse_exponent_expression(tokenizer);
+	if (rhs) return new BinaryOperatorExpression(lhs, token, rhs);
+	else return NULL;
+    }
+    return lhs;
+}
+
+Expression *parse_multiplication_expression(Tokenizer *tokenizer) {
+    Token *token;
+    Expression *lhs;
+
+    lhs = parse_exponent_expression(tokenizer);
 
     while (tokenizer->peek(&token) && (token->is_operator(OP_MULTIPLY) || token->is_operator(OP_DIVIDE))) {
 	tokenizer->pop();
-	Expression *rhs = parse_literal_expression(tokenizer);
+	Expression *rhs = parse_exponent_expression(tokenizer);
 	if (rhs == NULL) {
 	    return error("Failed to parse the rhs", token);
 	}
