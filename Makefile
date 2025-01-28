@@ -1,7 +1,12 @@
-CXXFLAGS = -g
+CXXFLAGS = -g -fpic
 
-expression: expression.o tokenizer.o
-	$(CXX) expression.o tokenizer.o -o expression
+expression: expression.o parser.o tokenizer.o utils.o
+	$(CXX) expression.o parser.o tokenizer.o utils.o -o expression
 
-expression.o: tokenizer.h
+clean:
+	rm -rf *.o expression
+
+expression.o: parser.h tokenizer.h utils.h
+parser.o: parser.h tokenizer.h utils.h
 tokenizer.o: tokenizer.h
+utils.o: utils.h

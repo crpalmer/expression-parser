@@ -53,9 +53,18 @@ Tokenizer::Tokenizer(const char *input) : input(input) {
     get_next_token();
 }
 
-bool Tokenizer::pop(Token **token) {
+bool Tokenizer::pop() {
     if (next_token == NULL) return false;
-    *token = next_token;
     get_next_token();
     return true;
+}
+
+bool Tokenizer::pop(Token **token) {
+    if (peek(token)) get_next_token();
+    return *token != NULL;
+}
+
+bool Tokenizer::peek(Token **token) {
+    *token = next_token;
+    return next_token != NULL;
 }

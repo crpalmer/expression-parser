@@ -18,6 +18,7 @@ class NumberToken : public Token {
 public:
     NumberToken(double value) : Token(TOK_NUMBER), value(value) {}
     void print() override;
+    double get_value() { return value; }
 
 private:
     double value;
@@ -27,6 +28,7 @@ class OperatorToken : public Token {
 public:
     OperatorToken(token_operator_t op) : Token(TOK_OPERATOR), op(op) {}
     void print() override;
+    token_operator_t get_operator() { return op; }
 
 private:
     token_operator_t op;
@@ -35,7 +37,9 @@ private:
 class Tokenizer {
 public:
     Tokenizer(const char *input);
+    bool pop();
     bool pop(Token **token);
+    bool peek(Token **token);
 
 private:
     const char *input;
