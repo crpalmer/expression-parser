@@ -94,3 +94,39 @@ double NaryOperatorExpression::evaluate() {
 
     return v;
 }
+
+void UnaryOperatorExpression::simplify() {
+    expr->simplify();
+}
+
+void BinaryOperatorExpression::simplify() {
+    if (lhs->can_evaluate()) lhs = new LiteralExpression(lhs->evaluate());
+    else lhs->simplify();
+
+    if (rhs->can_evaluate()) rhs = new LiteralExpression(rhs->evaluate());
+    else rhs->simplify();
+}
+
+void NaryOperatorExpression::simplify() {
+    std::list<Expression *> new_exprs;
+    bool first_v = true;
+    double v = 0;
+
+    for (auto expr : exprs) {
+	if (! expr->can_evaluate()) {
+	    expr->simplify();
+	    new_exprs.push_back(expr);
+	} else if (first_v) {
+	    first_v = false;
+	    v = expr->evaluate();
+	} else {
+	    switch (op) {
+	    case EXPR_ADDITION: v += expr->evaluate(); break;
+	    case EXPR_MULTIPLICATION: v *= expr->evaluate(); break;
+	    }
+	}
+    }
+
+    if (! first_v) new_exprs.push_back(new LiteralExpression(v));
+    exprs = new_exprs;
+}

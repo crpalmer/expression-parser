@@ -12,10 +12,13 @@ int main(int argc, char **argv) {
 	Expression *expr = parse_expression(new Tokenizer(line));
 	if (expr != NULL) {
 	    expr->print();
+	    printf(" = ");
 	    if (expr->can_evaluate()) {
-	        printf(" = ");
 		double value = expr->evaluate();
 		print_number(value);
+	    } else {
+		expr->simplify();
+		expr->print();
 	    }
 	    printf("\n");
 	}

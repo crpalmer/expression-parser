@@ -12,16 +12,18 @@ typedef enum { EXPR_EXPONENTIATION } binary_expression_t;
 class Expression {
 public:
     virtual void print() = 0;
-    virtual double evaluate() = 0;
     virtual bool can_evaluate() = 0;
+    virtual double evaluate() = 0;
+    virtual void simplify() { }
 };
 
 class UnaryOperatorExpression : public Expression {
 public:
     UnaryOperatorExpression(unary_expression_t op, Expression *expr) : op(op), expr(expr) {}
     void print() override;
-    double evaluate() override;
     bool can_evaluate() override { return expr->can_evaluate(); }
+    double evaluate() override;
+    void simplify() override;
 
 private:
     unary_expression_t op;
@@ -32,8 +34,9 @@ class BinaryOperatorExpression : public Expression {
 public:
     BinaryOperatorExpression(Expression *lhs, binary_expression_t op, Expression *rhs) : lhs(lhs), op(op), rhs(rhs) {}
     void print() override;
-    double evaluate() override;
     bool can_evaluate() override { return lhs->can_evaluate() && rhs->can_evaluate(); }
+    double evaluate() override;
+    void simplify() override;
 
 private:
     binary_expression_t op;
@@ -45,8 +48,9 @@ public:
     NaryOperatorExpression(nary_expression_t op) : op(op) {}
     void add_expression(Expression *expr);
     void print() override;
-    double evaluate() override;
     bool can_evaluate() override;
+    double evaluate() override;
+    void simplify() override;
 
 private:
     nary_expression_t op;
