@@ -27,10 +27,14 @@ Expression *parse_literal_expression(Tokenizer *tokenizer) {
 	VariableToken *var = (VariableToken *) token;
 	return new VariableExpression(var);
     }
-    if (token->is_operator(OP_MINUS) || token->is_operator(OP_PLUS)) {
+    if (token->is_operator(OP_PLUS)) {
+	tokenizer->pop();
+	return parse_literal_expression(tokenizer);
+    }
+    if (token->is_operator(OP_MINUS)) {
 	tokenizer->pop();
 	Expression *expr = parse_literal_expression(tokenizer);
-	if (expr) expr = new UnaryOperatorExpression(token, expr);
+	if (expr) expr = new UnaryOperatorExpression(EXPR_NEGATION, expr);
 	return expr;
     }
     if (token->is_operator(OP_OPEN_PAREN)) {
@@ -52,7 +56,7 @@ Expression *parse_exponent_expression(Tokenizer *tokenizer) {
     if (tokenizer->peek(&token) && token->is_operator(OP_EXPONENT)) {
 	tokenizer->pop();
 	Expression *rhs = parse_exponent_expression(tokenizer);
-	if (rhs) return new BinaryOperatorExpression(lhs, token, rhs);
+	if (rhs) return new BinaryOperatorExpression(lhs, EXPR_EXPONENTIATION, rhs);
 	else return NULL;
     }
     return lhs;
@@ -70,7 +74,10 @@ Expression *parse_multiplication_expression(Tokenizer *tokenizer) {
 	if (rhs == NULL) {
 	    return error("Failed to parse the rhs", token);
 	}
-	lhs = new BinaryOperatorExpression(lhs, token, rhs);
+	if (token->is_operator(OP_DIVIDE)) {
+	     rhs = new UnaryOperatorExpression(EXPR_ONE_OVER, rhs);
+	}
+	lhs = new BinaryOperatorExpression(lhs, EXPR_MULTIPLICATION, rhs);
     }
     return lhs;
 }
@@ -87,7 +94,10 @@ Expression *parse_addition_expression(Tokenizer *tokenizer) {
 	if (rhs == NULL) {
 	    return error("Failed to parse the rhs", token);
 	}
-	lhs = new BinaryOperatorExpression(lhs, token, rhs);
+	if (token->is_operator(OP_MINUS)) {
+	     rhs = new UnaryOperatorExpression(EXPR_NEGATION, rhs);
+	}
+	lhs = new BinaryOperatorExpression(lhs, EXPR_ADDITION, rhs);
     }
     return lhs;
 }

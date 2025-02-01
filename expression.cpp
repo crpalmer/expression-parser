@@ -15,7 +15,10 @@ void VariableExpression::print() {
 
 void UnaryOperatorExpression::print() {
     printf("(");
-    op->print();
+    switch (op) {
+    case EXPR_NEGATION: printf("-"); break;
+    case EXPR_ONE_OVER: printf("1/"); break;
+    }
     expr->print();
     printf(")");
 }
@@ -23,25 +26,31 @@ void UnaryOperatorExpression::print() {
 void BinaryOperatorExpression::print() {
     printf("(");
     lhs->print();
-    op->print();
+    switch (op) {
+    case EXPR_ADDITION: printf("+"); break;
+    case EXPR_MULTIPLICATION: printf("*"); break;
+    case EXPR_EXPONENTIATION: printf("^"); break;
+    }
     rhs->print();
     printf(")");
 }
 
 double UnaryOperatorExpression::evaluate() {
     double v = expr->evaluate();
-    if (op->is_operator(OP_PLUS)) return v;
-    if (op->is_operator(OP_MINUS)) return -v;
+    switch (op) {
+    case EXPR_NEGATION: return -v;
+    case EXPR_ONE_OVER: return 1/v;
+    }
     assert(0);
 }
 
 double BinaryOperatorExpression::evaluate() {
     double v1 = lhs->evaluate();
     double v2 = rhs->evaluate();
-    if (op->is_operator(OP_PLUS)) return v1 + v2;
-    if (op->is_operator(OP_MINUS)) return v1 - v2;
-    if (op->is_operator(OP_MULTIPLY)) return v1 * v2;
-    if (op->is_operator(OP_DIVIDE)) return v1 / v2;
-    if (op->is_operator(OP_EXPONENT)) return pow(v1, v2);
+    switch (op) {
+    case EXPR_ADDITION: return v1 + v2;
+    case EXPR_MULTIPLICATION: return v1 * v2;
+    case EXPR_EXPONENTIATION: return pow(v1, v2);
+    }
     assert(0);
 }

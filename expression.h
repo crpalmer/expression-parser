@@ -4,6 +4,9 @@
 #include <assert.h>
 #include "tokenizer.h"
 
+typedef enum { EXPR_NEGATION, EXPR_ONE_OVER } unary_expression_t;
+typedef enum { EXPR_ADDITION, EXPR_MULTIPLICATION, EXPR_EXPONENTIATION } binary_expression_t;
+
 class Expression {
 public:
     virtual void print() = 0;
@@ -13,25 +16,25 @@ public:
 
 class UnaryOperatorExpression : public Expression {
 public:
-    UnaryOperatorExpression(Token *op, Expression *expr) : op(op), expr(expr) {}
+    UnaryOperatorExpression(unary_expression_t op, Expression *expr) : op(op), expr(expr) {}
     void print() override;
     double evaluate() override;
     bool can_evaluate() override { return expr->can_evaluate(); }
 
 private:
-    Token *op;
+    unary_expression_t op;
     Expression *expr;
 };
 
 class BinaryOperatorExpression : public Expression {
 public:
-    BinaryOperatorExpression(Expression *lhs, Token *op, Expression *rhs) : lhs(lhs), op(op), rhs(rhs) {}
+    BinaryOperatorExpression(Expression *lhs, binary_expression_t op, Expression *rhs) : lhs(lhs), op(op), rhs(rhs) {}
     void print() override;
     double evaluate() override;
     bool can_evaluate() override { return lhs->can_evaluate() && rhs->can_evaluate(); }
 
 private:
-    Token *op;
+    binary_expression_t op;
     Expression *lhs, *rhs;
 };
 
