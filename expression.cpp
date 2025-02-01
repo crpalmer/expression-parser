@@ -101,19 +101,22 @@ double NaryOperatorExpression::evaluate() {
     return v;
 }
 
-void UnaryOperatorExpression::simplify() {
+Expression *UnaryOperatorExpression::simplify() {
     expr->simplify();
+    return this;
 }
 
-void BinaryOperatorExpression::simplify() {
+Expression *BinaryOperatorExpression::simplify() {
     if (lhs->can_evaluate()) lhs = new LiteralExpression(lhs->evaluate());
-    else lhs->simplify();
+    else lhs = lhs->simplify();
 
     if (rhs->can_evaluate()) rhs = new LiteralExpression(rhs->evaluate());
-    else rhs->simplify();
+    else rhs = rhs->simplify();
+
+    return this;
 }
 
-void NaryOperatorExpression::simplify() {
+Expression *NaryOperatorExpression::simplify() {
     std::list<Expression *> new_exprs;
     bool first_v = true;
     bool did_something = false;
@@ -121,8 +124,7 @@ void NaryOperatorExpression::simplify() {
 
     for (auto expr : exprs) {
 	if (! expr->can_evaluate()) {
-	    expr->simplify();
-	    new_exprs.push_back(expr);
+	    new_exprs.push_back(expr->simplify());
 	} else if (first_v) {
 	    first_v = false;
 	    v = expr->evaluate();
@@ -149,11 +151,15 @@ void NaryOperatorExpression::simplify() {
 	print();
 	printf("\n");
     }
+
+    if (exprs.size() == 1) return exprs.front();
+    else return this;
 }
 
-void EqualityExpression::simplify() {
+Expression *EqualityExpression::simplify() {
     printf("Trying to simplify the LHS:\n");
     lhs->simplify();
     printf("Trying to simplify the RHS:\n");
     rhs->simplify();
+    return this;
 }

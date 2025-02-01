@@ -14,7 +14,7 @@ public:
     virtual void print() = 0;
     virtual bool can_evaluate() = 0;
     virtual double evaluate() = 0;
-    virtual void simplify() { }
+    virtual Expression *simplify() { return this; }
 };
 
 class UnaryOperatorExpression : public Expression {
@@ -23,7 +23,7 @@ public:
     void print() override;
     bool can_evaluate() override { return expr->can_evaluate(); }
     double evaluate() override;
-    void simplify() override;
+    Expression *simplify() override;
 
 private:
     unary_expression_t op;
@@ -36,7 +36,7 @@ public:
     void print() override;
     bool can_evaluate() override { return lhs->can_evaluate() && rhs->can_evaluate(); }
     double evaluate() override;
-    void simplify() override;
+    Expression *simplify() override;
 
 private:
     binary_expression_t op;
@@ -50,7 +50,7 @@ public:
     void print() override;
     bool can_evaluate() override;
     double evaluate() override;
-    void simplify() override;
+    Expression *simplify() override;
 
 private:
     nary_expression_t op;
@@ -85,7 +85,7 @@ public:
     void print() override;
     double evaluate() override { assert(0); }
     bool can_evaluate() override { return false; }
-    void simplify() override;
+    Expression *simplify() override;
 
 private:
     Expression *lhs;
