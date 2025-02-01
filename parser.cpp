@@ -65,11 +65,16 @@ Expression *parse_exponent_expression(Tokenizer *tokenizer) {
 Expression *parse_multiplication_expression(Tokenizer *tokenizer) {
     Token *token;
     Expression *lhs;
+    NaryOperatorExpression *expr = NULL;
 
     lhs = parse_exponent_expression(tokenizer);
 
     while (tokenizer->peek(&token) && (token->is_operator(OP_MULTIPLY) || token->is_operator(OP_DIVIDE))) {
 	tokenizer->pop();
+	if (expr == NULL) {
+	    expr = new NaryOperatorExpression(EXPR_MULTIPLICATION);
+	    expr->add_expression(lhs);
+	}
 	Expression *rhs = parse_exponent_expression(tokenizer);
 	if (rhs == NULL) {
 	    return error("Failed to parse the rhs", token);
@@ -77,19 +82,24 @@ Expression *parse_multiplication_expression(Tokenizer *tokenizer) {
 	if (token->is_operator(OP_DIVIDE)) {
 	     rhs = new UnaryOperatorExpression(EXPR_ONE_OVER, rhs);
 	}
-	lhs = new BinaryOperatorExpression(lhs, EXPR_MULTIPLICATION, rhs);
+	expr->add_expression(rhs);
     }
-    return lhs;
+    return expr ? expr : lhs;
 }
 
 Expression *parse_addition_expression(Tokenizer *tokenizer) {
     Token *token;
     Expression *lhs;
+    NaryOperatorExpression *expr = NULL;
 
     lhs = parse_multiplication_expression(tokenizer);
 
     while (tokenizer->peek(&token) && (token->is_operator(OP_PLUS) || token->is_operator(OP_MINUS))) {
 	tokenizer->pop();
+	if (expr == NULL) {
+	    expr = new NaryOperatorExpression(EXPR_ADDITION);
+	    expr->add_expression(lhs);
+	}
 	Expression *rhs = parse_multiplication_expression(tokenizer);
 	if (rhs == NULL) {
 	    return error("Failed to parse the rhs", token);
@@ -97,9 +107,9 @@ Expression *parse_addition_expression(Tokenizer *tokenizer) {
 	if (token->is_operator(OP_MINUS)) {
 	     rhs = new UnaryOperatorExpression(EXPR_NEGATION, rhs);
 	}
-	lhs = new BinaryOperatorExpression(lhs, EXPR_ADDITION, rhs);
+	expr->add_expression(rhs);
     }
-    return lhs;
+    return expr ? expr : lhs;
 }
 
 Expression *parse_expression0(Tokenizer *tokenizer) {

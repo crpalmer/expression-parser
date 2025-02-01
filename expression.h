@@ -2,10 +2,12 @@
 #define __EXPRESSION_H__
 
 #include <assert.h>
+#include <list>
 #include "tokenizer.h"
 
 typedef enum { EXPR_NEGATION, EXPR_ONE_OVER } unary_expression_t;
-typedef enum { EXPR_ADDITION, EXPR_MULTIPLICATION, EXPR_EXPONENTIATION } binary_expression_t;
+typedef enum { EXPR_ADDITION, EXPR_MULTIPLICATION } nary_expression_t;
+typedef enum { EXPR_EXPONENTIATION } binary_expression_t;
 
 class Expression {
 public:
@@ -36,6 +38,19 @@ public:
 private:
     binary_expression_t op;
     Expression *lhs, *rhs;
+};
+
+class NaryOperatorExpression : public Expression {
+public:
+    NaryOperatorExpression(nary_expression_t op) : op(op) {}
+    void add_expression(Expression *expr);
+    void print() override;
+    double evaluate() override;
+    bool can_evaluate() override;
+
+private:
+    nary_expression_t op;
+    std::list<Expression *> exprs;
 };
 
 class LiteralExpression : public Expression {

@@ -5,6 +5,18 @@
 #include "parser.h"
 #include "utils.h"
 
+bool NaryOperatorExpression::can_evaluate() {
+    bool yes = true;
+    for (auto expr : exprs) {
+	yes = yes && expr->can_evaluate();
+    }
+    return yes;
+}
+
+void NaryOperatorExpression::add_expression(Expression *expr) {
+    exprs.push_back(expr);
+}
+
 void LiteralExpression::print() {
     print_number(value);
 }
@@ -27,11 +39,22 @@ void BinaryOperatorExpression::print() {
     printf("(");
     lhs->print();
     switch (op) {
-    case EXPR_ADDITION: printf("+"); break;
-    case EXPR_MULTIPLICATION: printf("*"); break;
     case EXPR_EXPONENTIATION: printf("^"); break;
     }
     rhs->print();
+    printf(")");
+}
+
+void NaryOperatorExpression::print() {
+    printf("(");
+    switch (op) {
+    case EXPR_ADDITION: printf("+"); break;
+    case EXPR_MULTIPLICATION: printf("*"); break;
+    }
+    for (auto expr : exprs) {
+	printf(" ");
+	expr->print();
+    }
     printf(")");
 }
 
@@ -48,9 +71,26 @@ double BinaryOperatorExpression::evaluate() {
     double v1 = lhs->evaluate();
     double v2 = rhs->evaluate();
     switch (op) {
-    case EXPR_ADDITION: return v1 + v2;
-    case EXPR_MULTIPLICATION: return v1 * v2;
     case EXPR_EXPONENTIATION: return pow(v1, v2);
     }
     assert(0);
+}
+
+double NaryOperatorExpression::evaluate() {
+    bool is_first = true;
+    double v = 0;
+
+    for (auto expr : exprs) {
+	if (is_first) {
+	    v = expr->evaluate();
+	    is_first = false;
+	} else {
+	    switch (op) {
+	    case EXPR_ADDITION: v += expr->evaluate(); break;
+	    case EXPR_MULTIPLICATION: v *= expr->evaluate(); break;
+	    }
+	}
+    }
+
+    return v;
 }
