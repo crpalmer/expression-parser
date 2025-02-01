@@ -53,6 +53,10 @@ void Tokenizer::get_next_token() {
 	char *name = (char *) malloc(pos - start + 1);
 	strncpy(name, &input[start], pos - start);
 	name[pos - start] = '\0';
+	if (strcmp(name, "x") != 0) {
+	    printf("only 'x' may be a variable.\n");
+	    return;
+	}
 	next_token = new VariableToken(name);
     } else {
 	switch(input[pos]) {
