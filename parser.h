@@ -4,6 +4,6 @@
 #include "expression.h"
 #include "tokenizer.h"
 
-Expression *parse_expression(Tokenizer *tokenizer);
+Expression *parse_statement(Tokenizer *tokenizer);
 
 #endif

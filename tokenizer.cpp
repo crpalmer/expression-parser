@@ -23,6 +23,7 @@ void OperatorToken::print() {
     case OP_MULTIPLY: printf("*"); break;
     case OP_DIVIDE: printf("/"); break;
     case OP_EXPONENT: printf("^"); break;
+    case OP_EQUALITY: printf("="); break;
     default: assert(0);
     }
 }
@@ -67,6 +68,7 @@ void Tokenizer::get_next_token() {
 	case '*': next_token = new OperatorToken(OP_MULTIPLY); break;
 	case '/': next_token = new OperatorToken(OP_DIVIDE); break;
 	case '^': next_token = new OperatorToken(OP_EXPONENT); break;
+	case '=': next_token = new OperatorToken(OP_EQUALITY); break;
 	default:
 	    printf("Unknown operator '%c':\n", input[pos]);
 	    printf("%.*s ^^^ %s\n", pos, input, &input[pos]);

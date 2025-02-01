@@ -5,7 +5,7 @@
 #include "parser.h"
 #include "utils.h"
 
-Expression *parse_expression0(Tokenizer *tokenizer);
+static Expression *parse_expression(Tokenizer *tokenizer);
 
 Expression *error(const char *str, Token *token) {
     printf("%s: ", str);
@@ -39,7 +39,7 @@ Expression *parse_literal_expression(Tokenizer *tokenizer) {
     }
     if (token->is_operator(OP_OPEN_PAREN)) {
 	tokenizer->pop();
-	Expression *expr = parse_expression0(tokenizer);
+	Expression *expr = parse_expression(tokenizer);
 	if (! tokenizer->pop(&token) || ! token->is_operator(OP_CLOSE_PAREN)) {
 	    return error("Missing closing parenthesis", token);
 	}
@@ -112,13 +112,18 @@ Expression *parse_addition_expression(Tokenizer *tokenizer) {
     return expr ? expr : lhs;
 }
 
-Expression *parse_expression0(Tokenizer *tokenizer) {
+static Expression *parse_expression(Tokenizer *tokenizer) {
     return parse_addition_expression(tokenizer);
 }
 
-Expression *parse_expression(Tokenizer *tokenizer) {
+Expression *parse_statement(Tokenizer *tokenizer) {
     Token *token;
-    Expression *expr = parse_expression0(tokenizer);
+    Expression *expr = parse_expression(tokenizer);
+    if (tokenizer->peek(&token) && token->is_operator(OP_EQUALITY)) {
+	tokenizer->pop();
+	Expression *rhs = parse_expression(tokenizer);
+	expr = new EqualityExpression(expr, rhs);
+    }
     if (tokenizer->pop(&token)) return error("Extra input", token);
     return expr;
 }

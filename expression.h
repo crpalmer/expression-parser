@@ -79,4 +79,17 @@ private:
     VariableToken *var;
 };
 
+class EqualityExpression : public Expression {
+public:
+    EqualityExpression(Expression *lhs, Expression *rhs) : lhs(lhs), rhs(rhs) {}
+    void print() override;
+    double evaluate() override { assert(0); }
+    bool can_evaluate() override { return false; }
+    void simplify() override;
+
+private:
+    Expression *lhs;
+    Expression *rhs;
+};
+
 #endif

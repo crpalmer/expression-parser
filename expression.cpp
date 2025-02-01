@@ -58,6 +58,12 @@ void NaryOperatorExpression::print() {
     printf(")");
 }
 
+void EqualityExpression::print() {
+    lhs->print();
+    printf(" = ");
+    rhs->print();
+}
+
 double UnaryOperatorExpression::evaluate() {
     double v = expr->evaluate();
     switch (op) {
@@ -143,4 +149,11 @@ void NaryOperatorExpression::simplify() {
 	print();
 	printf("\n");
     }
+}
+
+void EqualityExpression::simplify() {
+    printf("Trying to simplify the LHS:\n");
+    lhs->simplify();
+    printf("Trying to simplify the RHS:\n");
+    rhs->simplify();
 }

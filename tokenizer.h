@@ -6,7 +6,8 @@ typedef enum {
     OP_PLUS, OP_MINUS,
     OP_OPEN_PAREN, OP_CLOSE_PAREN,
     OP_MULTIPLY, OP_DIVIDE,
-    OP_EXPONENT,
+    OP_EXPONENT, 
+    OP_EQUALITY,
 } token_operator_t;
 
 class Token {

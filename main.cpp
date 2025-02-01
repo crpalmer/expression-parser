@@ -9,7 +9,7 @@ static char line[100*1024];
 
 int main(int argc, char **argv) {
     while (fgets(line, sizeof(line), stdin) != NULL) {
-	Expression *expr = parse_expression(new Tokenizer(line));
+	Expression *expr = parse_statement(new Tokenizer(line));
 	if (expr != NULL) {
 	    if (expr->can_evaluate()) {
 	        expr->print();
