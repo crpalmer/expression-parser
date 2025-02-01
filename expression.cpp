@@ -110,6 +110,7 @@ void BinaryOperatorExpression::simplify() {
 void NaryOperatorExpression::simplify() {
     std::list<Expression *> new_exprs;
     bool first_v = true;
+    bool did_something = false;
     double v = 0;
 
     for (auto expr : exprs) {
@@ -120,6 +121,7 @@ void NaryOperatorExpression::simplify() {
 	    first_v = false;
 	    v = expr->evaluate();
 	} else {
+	    did_something = true;
 	    switch (op) {
 	    case EXPR_ADDITION: v += expr->evaluate(); break;
 	    case EXPR_MULTIPLICATION: v *= expr->evaluate(); break;
@@ -127,6 +129,18 @@ void NaryOperatorExpression::simplify() {
 	}
     }
 
+    if (did_something) {
+	if (new_exprs.empty()) printf("Evaluate: ");
+	else printf("Partially evaluate: ");
+	print();
+	printf(" => ");
+    }
+
     if (! first_v) new_exprs.push_back(new LiteralExpression(v));
     exprs = new_exprs;
+
+    if (did_something) {
+	print();
+	printf("\n");
+    }
 }

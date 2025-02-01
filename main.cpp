@@ -11,9 +11,9 @@ int main(int argc, char **argv) {
     while (fgets(line, sizeof(line), stdin) != NULL) {
 	Expression *expr = parse_expression(new Tokenizer(line));
 	if (expr != NULL) {
-	    expr->print();
-	    printf(" = ");
 	    if (expr->can_evaluate()) {
+	        expr->print();
+	        printf(" = ");
 		double value = expr->evaluate();
 		print_number(value);
 	    } else {
