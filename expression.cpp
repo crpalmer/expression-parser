@@ -124,6 +124,7 @@ Expression *NaryOperatorExpression::simplify(Expression *top) {
 
     for (auto expr : exprs) {
 	if (! expr->can_evaluate()) {
+	    did_something = true;
 	    new_exprs.push_back(expr->simplify(top));
 	} else if (first_v) {
 	    first_v = false;
