@@ -7,23 +7,23 @@
 #include "tokenizer.h"
 
 void VariableToken::print() {
-    printf("%s", name);
+    printf("variable<%s>", name);
 }
 
 void NumberToken::print() {
-    printf("%f", value);
+    printf("number<%f>", value);
 }
 
 void OperatorToken::print() {
     switch(op) {
-    case OP_PLUS: printf("+"); break;
-    case OP_MINUS: printf("-"); break;
-    case OP_OPEN_PAREN: printf("("); break;
-    case OP_CLOSE_PAREN: printf(")"); break;
-    case OP_MULTIPLY: printf("*"); break;
-    case OP_DIVIDE: printf("/"); break;
-    case OP_EXPONENT: printf("^"); break;
-    case OP_EQUALITY: printf("="); break;
+    case OP_PLUS: printf("operator<+>"); break;
+    case OP_MINUS: printf("operator<->"); break;
+    case OP_OPEN_PAREN: printf("operator<(>"); break;
+    case OP_CLOSE_PAREN: printf("operator<)>"); break;
+    case OP_MULTIPLY: printf("operator<*>"); break;
+    case OP_DIVIDE: printf("operator</>"); break;
+    case OP_EXPONENT: printf("operator<^>"); break;
+    case OP_EQUALITY: printf("operator<=>"); break;
     default: assert(0);
     }
 }
@@ -96,4 +96,9 @@ bool Tokenizer::pop(Token **token) {
 bool Tokenizer::peek(Token **token) {
     *token = next_token;
     return next_token != NULL;
+}
+
+void Tokenizer::reset() {
+    pos = 0;
+    get_next_token();
 }

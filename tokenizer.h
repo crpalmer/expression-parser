@@ -59,6 +59,7 @@ public:
     bool pop();
     bool pop(Token **token);
     bool peek(Token **token);
+    void reset();
 
 private:
     const char *input;
