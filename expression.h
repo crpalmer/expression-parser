@@ -14,7 +14,8 @@ public:
     virtual void print() = 0;
     virtual bool can_evaluate() = 0;
     virtual double evaluate() = 0;
-    virtual Expression *simplify() { return this; }
+    virtual Expression *simplify(Expression *top) { return this; }
+    virtual bool is_literal() { return false; }
 };
 
 class UnaryOperatorExpression : public Expression {
@@ -23,7 +24,7 @@ public:
     void print() override;
     bool can_evaluate() override { return expr->can_evaluate(); }
     double evaluate() override;
-    Expression *simplify() override;
+    Expression *simplify(Expression *top) override;
 
 private:
     unary_expression_t op;
@@ -36,7 +37,7 @@ public:
     void print() override;
     bool can_evaluate() override { return lhs->can_evaluate() && rhs->can_evaluate(); }
     double evaluate() override;
-    Expression *simplify() override;
+    Expression *simplify(Expression *top) override;
 
 private:
     binary_expression_t op;
@@ -50,7 +51,7 @@ public:
     void print() override;
     bool can_evaluate() override;
     double evaluate() override;
-    Expression *simplify() override;
+    Expression *simplify(Expression *top) override;
 
 private:
     nary_expression_t op;
@@ -63,6 +64,7 @@ public:
     void print() override;
     double evaluate() override { return value; }
     bool can_evaluate() override { return true; }
+    bool is_literal() override { return true; }
 
 private:
     double value;
@@ -85,7 +87,7 @@ public:
     void print() override;
     double evaluate() override { assert(0); }
     bool can_evaluate() override { return false; }
-    Expression *simplify() override;
+    Expression *simplify(Expression *top) override;
 
 private:
     Expression *lhs;

@@ -101,22 +101,22 @@ double NaryOperatorExpression::evaluate() {
     return v;
 }
 
-Expression *UnaryOperatorExpression::simplify() {
-    expr->simplify();
+Expression *UnaryOperatorExpression::simplify(Expression *top) {
+    expr->simplify(top);
     return this;
 }
 
-Expression *BinaryOperatorExpression::simplify() {
+Expression *BinaryOperatorExpression::simplify(Expression *top) {
     if (lhs->can_evaluate()) lhs = new LiteralExpression(lhs->evaluate());
-    else lhs = lhs->simplify();
+    else lhs = lhs->simplify(top);
 
     if (rhs->can_evaluate()) rhs = new LiteralExpression(rhs->evaluate());
-    else rhs = rhs->simplify();
+    else rhs = rhs->simplify(top);
 
     return this;
 }
 
-Expression *NaryOperatorExpression::simplify() {
+Expression *NaryOperatorExpression::simplify(Expression *top) {
     std::list<Expression *> new_exprs;
     bool first_v = true;
     bool did_something = false;
@@ -124,7 +124,7 @@ Expression *NaryOperatorExpression::simplify() {
 
     for (auto expr : exprs) {
 	if (! expr->can_evaluate()) {
-	    new_exprs.push_back(expr->simplify());
+	    new_exprs.push_back(expr->simplify(top));
 	} else if (first_v) {
 	    first_v = false;
 	    v = expr->evaluate();
@@ -139,16 +139,17 @@ Expression *NaryOperatorExpression::simplify() {
 
     if (did_something) {
 	if (new_exprs.empty()) printf("Evaluate: ");
-	else printf("Partially evaluate: ");
+	else printf("partial ev: ");
 	print();
-	printf(" => ");
+	printf("\n");
     }
 
     if (! first_v) new_exprs.push_back(new LiteralExpression(v));
     exprs = new_exprs;
 
     if (did_something) {
-	print();
+	printf("simplified: ");
+	top->print();
 	printf("\n");
     }
 
@@ -156,10 +157,30 @@ Expression *NaryOperatorExpression::simplify() {
     else return this;
 }
 
-Expression *EqualityExpression::simplify() {
-    printf("Trying to simplify the LHS:\n");
-    lhs->simplify();
-    printf("Trying to simplify the RHS:\n");
-    rhs->simplify();
+Expression *EqualityExpression::simplify(Expression *top) {
+    while (1) {
+	if (! lhs->can_evaluate()) {
+            printf("Trying to simplify the LHS:\n");
+            lhs->simplify(top);
+	    printf("\n");
+	} else if (! lhs->is_literal()) {
+	    printf("Evaluating the LHS = ");
+	    lhs = new LiteralExpression(lhs->evaluate());
+	    lhs->print();
+	    printf("\n");
+	}
+
+	if (! rhs->can_evaluate()) {
+	    printf("Trying to simplify the RHS:\n");
+	    rhs->simplify(top);
+	    printf("\n");
+	} else if (! rhs->is_literal()) {
+	    printf("Evaluating the RHS = ");
+	    rhs = new LiteralExpression(rhs->evaluate());
+	    rhs->print();
+	    printf("\n");
+	}
+	break;
+    }
     return this;
 }

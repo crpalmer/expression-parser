@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
 	bool first = true;
 	Token *token;
 
-	printf("token stream: ");
+	printf("tokens    : ");
 	while (tokenizer->pop(&token)) {
 	    if (! first) {
 		printf(", ");
@@ -27,13 +27,16 @@ int main(int argc, char **argv) {
 	tokenizer->reset();
 	Expression *expr = parse_statement(new Tokenizer(line));
 	if (expr != NULL) {
+	    printf("expression: ");
+	    expr->print();
+	    printf("\n");
 	    if (expr->can_evaluate()) {
-		expr->print();
-		printf(" = ");
+		printf("answer    : ");
 		double value = expr->evaluate();
 		print_number(value);
 	    } else {
-		expr->simplify();
+		expr->simplify(expr);
+		printf("simplified: ");
 		expr->print();
 	    }
 	    printf("\n");
